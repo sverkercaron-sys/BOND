@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@/lib/supabase/client";
 import { User, Couple } from "@/types";
 
 export function useCouple(user: User | null = null) {
@@ -9,10 +9,7 @@ export function useCouple(user: User | null = null) {
   const [partner, setPartner] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createClient();
 
   useEffect(() => {
     let isMounted = true;
@@ -40,9 +37,10 @@ export function useCouple(user: User | null = null) {
         }
 
         // Fetch partner data
-        const partnerId = user.is_user1
-          ? coupleData?.user2_id
-          : coupleData?.user1_id;
+        const partnerId =
+          user.id === coupleData?.user1_id
+            ? coupleData?.user2_id
+            : coupleData?.user1_id;
 
         if (partnerId) {
           const { data: partnerData, error: partnerError } = await supabase
