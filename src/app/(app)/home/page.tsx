@@ -71,7 +71,7 @@ export default function HomePage() {
 
   const handleMarkComplete = async () => {
     if (user) {
-      await markComplete(user.id, user.is_user1);
+      await markComplete(user.id, couple?.user1_id === user.id);
     }
   };
 
