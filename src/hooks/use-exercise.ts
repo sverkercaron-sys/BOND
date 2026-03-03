@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@/lib/supabase/client";
 import { DailyAssignment, Exercise } from "@/types";
 
 export function useExercise(coupleId: string | null = null) {
@@ -9,10 +9,7 @@ export function useExercise(coupleId: string | null = null) {
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createClient();
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -38,18 +35,17 @@ export function useExercise(coupleId: string | null = null) {
       );
 
       // Get random active exercise not in recent list
-      const { data: availableExercises, error: exerciseError } =
-        await supabase
-          .from("exercises")
-          .select("*")
-          .eq("is_active", true)
-          .order("id");
+      const { data: availableExercises, error: exerciseError } = await supabase
+        .from("exercises")
+        .select("*")
+        .eq("is_active", true)
+        .order("id");
 
       if (exerciseError) throw exerciseError;
 
-      const eligibleExercises = availableExercises?.filter(
-        (e) => !recentIds.has(e.id)
-      ) || [availableExercises?.[0]];
+      const eligibleExercises =
+        availableExercises?.filter((e) => !recentIds.has(e.id)) ||
+        [availableExercises?.[0]];
 
       if (eligibleExercises.length === 0 && availableExercises) {
         eligibleExercises.push(availableExercises[0]);
