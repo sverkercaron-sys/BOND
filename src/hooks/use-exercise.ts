@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { DailyAssignment, Exercise } from "@/types";
 
-export function useExercise(coupleId: string | null) {
+export function useExercise(coupleId: string | null = null) {
   const [assignment, setAssignment] = useState<DailyAssignment | null>(null);
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [loading, setLoading] = useState(true);
