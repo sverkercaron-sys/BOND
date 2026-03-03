@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@/lib/supabase/client";
 import { Milestone } from "@/types";
 
 export function useStreak(coupleId: string | null = null) {
@@ -12,10 +12,7 @@ export function useStreak(coupleId: string | null = null) {
   const [completedDays, setCompletedDays] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createClient();
 
   useEffect(() => {
     let isMounted = true;
@@ -67,10 +64,8 @@ export function useStreak(coupleId: string | null = null) {
           .select("date")
           .eq("couple_id", coupleId)
           .gte("date", sixtyDaysAgoStr)
-          .filter(
-            "(user1_completed, eq, true), (user2_completed, eq, true)",
-            "or"
-          );
+          .eq("user1_completed", true)
+          .eq("user2_completed", true);
 
         if (completedError) throw completedError;
 
