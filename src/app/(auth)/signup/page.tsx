@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,6 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const refToken = searchParams.get("ref");
   const supabase = createClient();
@@ -37,7 +36,7 @@ export default function SignupPage() {
       password,
       options: {
         data: { name, ref_token: refToken },
-        emailRedirectTo: `https://github.com/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
@@ -48,7 +47,7 @@ export default function SignupPage() {
     }
 
     if (data.session) {
-      router.push("/home");
+      window.location.href = "/home";
     } else {
       setSuccess(true);
     }
