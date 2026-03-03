@@ -11,9 +11,9 @@ import {
   isSameDay,
 } from "date-fns";
 import { sv } from "date-fns/locale";
-import { useAuth } from "@/hooks/useAuth";
-import { useCouple } from "@/hooks/useCouple";
-import { useStreak } from "@/hooks/useStreak";
+import { useAuth } from "@/hooks/use-auth";
+import { useCouple } from "@/hooks/use-couple";
+import { useStreak } from "@/hooks/use-streak";
 import { MILESTONE_INFO } from "@/types";
 import MilestoneBadge from "@/components/milestone-badge";
 
