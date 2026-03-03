@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/lib/auth";
-import { useCouple } from "@/lib/couple";
+import { useAuth } from "@/hooks/use-auth";
+import { useCouple } from "@/hooks/use-couple";
 import { createClient } from "@/lib/supabase/client";
 import { getInviteUrl } from "@/lib/invite";
 import { Card } from "@/components/ui/card";
