@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { User, Couple } from "@/types";
 
-export function useCouple(user: User | null) {
+export function useCouple(user: User | null = null) {
   const [couple, setCouple] = useState<Couple | null>(null);
   const [partner, setPartner] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
