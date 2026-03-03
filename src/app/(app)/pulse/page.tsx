@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { getDay, getHours, addDays, format } from "date-fns";
 import { sv } from "date-fns/locale";
-import { useAuth } from "@/hooks/useAuth";
-import { useCouple } from "@/hooks/useCouple";
+import { useAuth } from "@/hooks/use-auth";
+import { useCouple } from "@/hooks/use-couple";
 import { createClient } from "@/lib/supabase/client";
 import PulseChart from "@/components/pulse-chart";
 
