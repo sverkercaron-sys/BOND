@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { User } from "@/types";
 
-// Helper: read session from cookie manually
+// Read session directly from cookie - bypasses Supabase auth client lock issues
 function getSessionFromCookie() {
   if (typeof document === "undefined") return null;
   const cookies = document.cookie.split(";");
@@ -16,11 +15,8 @@ function getSessionFromCookie() {
       if (value.startsWith("base64-")) {
         try {
           const decoded = JSON.parse(atob(value.replace("base64-", "")));
-          if (decoded.access_token && decoded.refresh_token) {
-            return {
-              access_token: decoded.access_token,
-              refresh_token: decoded.refresh_token,
-            };
+          if (decoded.access_token && decoded.user?.id) {
+            return decoded;
           }
         } catch {
           return null;
@@ -35,46 +31,34 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
     let isMounted = true;
 
     const initAuth = async () => {
       try {
-        // First try getSession normally
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        const session = getSessionFromCookie();
+        if (!session?.user?.id || !session?.access_token) return;
 
-        let activeSession = session;
-
-        // If no session found, try reading cookie manually
-        if (!activeSession) {
-          const cookieSession = getSessionFromCookie();
-          if (cookieSession) {
-            const { data, error } = await supabase.auth.setSession({
-              access_token: cookieSession.access_token,
-              refresh_token: cookieSession.refresh_token,
-            });
-            if (!error && data.session) {
-              activeSession = data.session;
-            }
+        // Fetch user directly via REST API - no auth client, no locks
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_SUPABASE_URL +
+            "/rest/v1/users?select=*&id=eq." +
+            session.user.id,
+          {
+            headers: {
+              apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+              Authorization: "Bearer " + session.access_token,
+              "Content-Type": "application/json",
+            },
           }
-        }
+        );
 
-        if (activeSession?.user && isMounted) {
-          // Fetch user from users table
-          const { data: userData, error } = await supabase
-            .from("users")
-            .select("*")
-            .eq("id", activeSession.user.id)
-            .single();
+        if (!response.ok) throw new Error("Failed to fetch user");
 
-          if (error) throw error;
-          if (isMounted) {
-            setUser(userData);
-          }
+        const data = await response.json();
+        if (data.length > 0 && isMounted) {
+          setUser(data[0]);
         }
       } catch (error) {
         console.error("Auth error:", error);
@@ -87,39 +71,22 @@ export function useAuth() {
 
     initAuth();
 
-    // Subscribe to auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user && isMounted) {
-        const { data: userData } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-
-        if (isMounted) {
-          setUser(userData || null);
-        }
-      } else if (!session && isMounted) {
-        setUser(null);
-      }
-    });
-
     return () => {
       isMounted = false;
-      subscription?.unsubscribe();
     };
   }, []);
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-      router.push("/");
-    } catch (error) {
-      console.error("Sign out error:", error);
-    }
+    // Clear all Supabase cookies
+    document.cookie.split(";").forEach((c) => {
+      const name = c.trim().split("=")[0];
+      if (name.startsWith("sb-")) {
+        document.cookie =
+          name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+      }
+    });
+    setUser(null);
+    router.push("/");
   };
 
   return { user, loading, signOut };
