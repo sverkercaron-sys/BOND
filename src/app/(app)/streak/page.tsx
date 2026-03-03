@@ -8,7 +8,6 @@ import {
   eachDayOfInterval,
   format,
   subMonths,
-  isSameDay,
 } from "date-fns";
 import { sv } from "date-fns/locale";
 import { useAuth } from "@/hooks/use-auth";
@@ -26,9 +25,14 @@ interface CalendarDay {
 
 export default function StreakPage() {
   const { user, loading: authLoading } = useAuth();
-  const { couple, loading: coupleLoading } = useCouple();
-  const { streak, bestStreak, totalExercises, loading: streakLoading } =
-    useStreak();
+  const { couple, loading: coupleLoading } = useCouple(user || null);
+  const {
+    streakCurrent,
+    streakBest,
+    totalExercises,
+    completedDays,
+    loading: streakLoading,
+  } = useStreak(user?.couple_id || null);
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [previousMonth, setPreviousMonth] = useState(subMonths(new Date(), 1));
@@ -53,19 +57,21 @@ export default function StreakPage() {
 
     const allDays = [...prevMonthDays, ...currentMonthDays];
 
-    // TODO: Fetch completed exercises from Supabase to mark days
-    const calendarWithStatus = allDays.map((day) => ({
-      date: day,
-      isCompleted: false, // Will be populated from Supabase query
-      isFuture: day > new Date(),
-      isMissed: day <= new Date() && !false, // Placeholder
-    }));
+    const calendarWithStatus = allDays.map((day) => {
+      const dateStr = format(day, "yyyy-MM-dd");
+      const isCompleted = completedDays.includes(dateStr);
+      return {
+        date: day,
+        isCompleted,
+        isFuture: day > new Date(),
+        isMissed: day <= new Date() && !isCompleted,
+      };
+    });
 
     setCalendarData(calendarWithStatus);
-  }, [currentMonth, previousMonth]);
+  }, [currentMonth, previousMonth, completedDays]);
 
   useEffect(() => {
-    // TODO: Fetch milestone achievements from Supabase
     setMilestoneData(
       Object.entries(MILESTONE_INFO).map(([key, info]) => ({
         type: key,
@@ -102,9 +108,11 @@ export default function StreakPage() {
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          🔥 {streak}
+          🔥 {streakCurrent}
         </motion.div>
-        <h1 className="text-3xl font-bold text-bond-text">ERAN RESA TILLSAMMANS</h1>
+        <h1 className="text-3xl font-bold text-bond-text">
+          ERAN RESA TILLSAMMANS
+        </h1>
         <p className="text-bond-text-light">dagar i rad</p>
       </motion.div>
 
@@ -117,11 +125,13 @@ export default function StreakPage() {
       >
         <div className="bg-bond-bg-alt p-4 rounded-lg text-center">
           <p className="text-sm text-bond-text-light mb-2">Bästa streak</p>
-          <p className="text-3xl font-bold text-bond-success">{bestStreak}</p>
+          <p className="text-3xl font-bold text-bond-success">{streakBest}</p>
         </div>
         <div className="bg-bond-bg-alt p-4 rounded-lg text-center">
           <p className="text-sm text-bond-text-light mb-2">Totala övningar</p>
-          <p className="text-3xl font-bold text-bond-primary">{totalExercises}</p>
+          <p className="text-3xl font-bold text-bond-primary">
+            {totalExercises}
+          </p>
         </div>
       </motion.div>
 
@@ -138,16 +148,20 @@ export default function StreakPage() {
             {format(previousMonth, "MMMM yyyy", { locale: sv })}
           </h2>
           <div className="grid grid-cols-7 gap-2">
-            {["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].map((day) => (
-              <div
-                key={day}
-                className="text-center text-xs font-semibold text-bond-text-light"
-              >
-                {day}
-              </div>
-            ))}
+            {["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].map(
+              (day) => (
+                <div
+                  key={day}
+                  className="text-center text-xs font-semibold text-bond-text-light"
+                >
+                  {day}
+                </div>
+              )
+            )}
             {calendarData
-              .filter((day) => day.date.getMonth() === previousMonth.getMonth())
+              .filter(
+                (day) => day.date.getMonth() === previousMonth.getMonth()
+              )
               .map((day, idx) => (
                 <div key={`prev-${idx}`} className="text-center">
                   {day.isCompleted ? (
@@ -168,16 +182,20 @@ export default function StreakPage() {
             {format(currentMonth, "MMMM yyyy", { locale: sv })}
           </h2>
           <div className="grid grid-cols-7 gap-2">
-            {["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].map((day) => (
-              <div
-                key={day}
-                className="text-center text-xs font-semibold text-bond-text-light"
-              >
-                {day}
-              </div>
-            ))}
+            {["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].map(
+              (day) => (
+                <div
+                  key={day}
+                  className="text-center text-xs font-semibold text-bond-text-light"
+                >
+                  {day}
+                </div>
+              )
+            )}
             {calendarData
-              .filter((day) => day.date.getMonth() === currentMonth.getMonth())
+              .filter(
+                (day) => day.date.getMonth() === currentMonth.getMonth()
+              )
               .map((day, idx) => (
                 <div key={`curr-${idx}`} className="text-center">
                   {day.isCompleted ? (
