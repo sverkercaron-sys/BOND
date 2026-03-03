@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: "Dagliga övningar för att stärka er relation och bygga en djupare koppling.",
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: {
