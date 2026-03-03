@@ -46,7 +46,7 @@ export function useStreak(coupleId: string | null = null) {
           .from("milestones")
           .select("*")
           .eq("couple_id", coupleId)
-          .order("threshold");
+          ;
 
         if (milestoneError) throw milestoneError;
 
@@ -61,16 +61,16 @@ export function useStreak(coupleId: string | null = null) {
 
         const { data: completedData, error: completedError } = await supabase
           .from("daily_assignments")
-          .select("date")
+          .select("assigned_date")
           .eq("couple_id", coupleId)
-          .gte("date", sixtyDaysAgoStr)
+          .gte("assigned_date", sixtyDaysAgoStr)
           .eq("user1_completed", true)
           .eq("user2_completed", true);
 
         if (completedError) throw completedError;
 
         if (isMounted) {
-          const days = completedData?.map((a) => a.date) || [];
+          const days = completedData?.map((a) => a.assigned_date) || [];
           setCompletedDays(days);
         }
       } catch (error) {
