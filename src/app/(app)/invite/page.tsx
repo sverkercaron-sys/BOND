@@ -26,7 +26,13 @@ export default function InvitePage() {
   const [showInviteModal, setShowInviteModal] = useState(false);
 
   useEffect(() => {
-    if (!user || !couple) return;
+    if (!user) return;
+
+    if (!couple) {
+      setMode("no-partner");
+      setIsLoading(false);
+      return;
+    }
 
     if (couple.user2_id) {
       setMode("has-partner");
@@ -100,7 +106,7 @@ export default function InvitePage() {
                 <div className="flex gap-3">
                   <Button className="flex-1">Skicka inbjudan</Button>
                   <Button variant="outline" className="flex-1">
-                    Kopiera länk
+                    Kopiera lÃ¤nk
                   </Button>
                 </div>
               </div>
@@ -109,13 +115,13 @@ export default function InvitePage() {
             {/* Cross-sell section */}
             <div className="mt-12">
               <h3 className="text-lg font-bold text-gray-900 mb-4">
-                Upptäck fler Dripline-produkter
+                UpptÃ¤ck fler Dripline-produkter
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
                   <h4 className="font-bold text-gray-900 mb-2">Insights</h4>
                   <p className="text-sm text-gray-600">
-                    Få personlig feedback och insikter
+                    FÃ¥ personlig feedback och insikter
                   </p>
                   <Button
                     variant="outline"
@@ -128,7 +134,7 @@ export default function InvitePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Lär dig mer
+                      LÃ¤r dig mer
                     </a>
                   </Button>
                 </Card>
@@ -136,7 +142,7 @@ export default function InvitePage() {
                 <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
                   <h4 className="font-bold text-gray-900 mb-2">PUSH</h4>
                   <p className="text-sm text-gray-600">
-                    Nå dina mål tillsammans
+                    NÃ¥ dina mÃ¥l tillsammans
                   </p>
                   <Button
                     variant="outline"
@@ -149,7 +155,7 @@ export default function InvitePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Lär dig mer
+                      LÃ¤r dig mer
                     </a>
                   </Button>
                 </Card>
@@ -157,7 +163,7 @@ export default function InvitePage() {
                 <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
                   <h4 className="font-bold text-gray-900 mb-2">MIRROR</h4>
                   <p className="text-sm text-gray-600">
-                    Se ditt värde reflekterat
+                    Se ditt vÃ¤rde reflekterat
                   </p>
                   <Button
                     variant="outline"
@@ -170,7 +176,7 @@ export default function InvitePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Lär dig mer
+                      LÃ¤r dig mer
                     </a>
                   </Button>
                 </Card>
@@ -184,22 +190,22 @@ export default function InvitePage() {
           <div className="space-y-6">
             <Card className="p-6 border-2 border-green-200 bg-green-50">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">✓</span>
+                <span className="text-2xl">â</span>
                 <h2 className="text-lg font-bold text-gray-900">
-                  Du och din partner är kopplade!
+                  Du och din partner Ã¤r kopplade!
                 </h2>
               </div>
               <p className="text-green-700">
-                Börja med era dagliga övningar för att stärka relationen.
+                BÃ¶rja med era dagliga Ã¶vningar fÃ¶r att stÃ¤rka relationen.
               </p>
             </Card>
 
             <Card className="p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-2">
-                Bjud in ett par ni känner
+                Bjud in ett par ni kÃ¤nner
               </h2>
               <p className="text-gray-600 mb-4">
-                Bjud in 3 par → lås upp bonusövningar
+                Bjud in 3 par â lÃ¥s upp bonusÃ¶vningar
               </p>
 
               <div className="mb-6">
@@ -208,7 +214,7 @@ export default function InvitePage() {
                     {acceptedCount}/3 par bjudna
                   </span>
                   <span className="text-sm text-gray-600">
-                    {acceptedCount === 3 ? "Olåst!" : ""}
+                    {acceptedCount === 3 ? "OlÃ¥st!" : ""}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
@@ -224,7 +230,7 @@ export default function InvitePage() {
               <div className="space-y-3 mb-6">
                 <Input
                   type="email"
-                  placeholder="E-post på ett par ni känner"
+                  placeholder="E-post pÃ¥ ett par ni kÃ¤nner"
                   className="bg-white"
                 />
                 <Button className="w-full">Skicka inbjudan</Button>
@@ -253,7 +259,7 @@ export default function InvitePage() {
                         >
                           {invite.status === "accepted"
                             ? "Accepterad"
-                            : "Väntar"}
+                            : "VÃ¤ntar"}
                         </span>
                       </div>
                     ))}
@@ -265,13 +271,13 @@ export default function InvitePage() {
             {/* Cross-sell section */}
             <div className="mt-8">
               <h3 className="text-lg font-bold text-gray-900 mb-4">
-                Upptäck fler Dripline-produkter
+                UpptÃ¤ck fler Dripline-produkter
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
                   <h4 className="font-bold text-gray-900 mb-2">Insights</h4>
                   <p className="text-sm text-gray-600">
-                    Få personlig feedback och insikter
+                    FÃ¥ personlig feedback och insikter
                   </p>
                   <Button
                     variant="outline"
@@ -284,7 +290,7 @@ export default function InvitePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Lär dig mer
+                      LÃ¤r dig mer
                     </a>
                   </Button>
                 </Card>
@@ -292,7 +298,7 @@ export default function InvitePage() {
                 <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
                   <h4 className="font-bold text-gray-900 mb-2">PUSH</h4>
                   <p className="text-sm text-gray-600">
-                    Nå dina mål tillsammans
+                    NÃ¥ dina mÃ¥l tillsammans
                   </p>
                   <Button
                     variant="outline"
@@ -305,7 +311,7 @@ export default function InvitePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Lär dig mer
+                      LÃ¤r dig mer
                     </a>
                   </Button>
                 </Card>
@@ -313,7 +319,7 @@ export default function InvitePage() {
                 <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
                   <h4 className="font-bold text-gray-900 mb-2">MIRROR</h4>
                   <p className="text-sm text-gray-600">
-                    Se ditt värde reflekterat
+                    Se ditt vÃ¤rde reflekterat
                   </p>
                   <Button
                     variant="outline"
@@ -326,7 +332,7 @@ export default function InvitePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Lär dig mer
+                      LÃ¤r dig mer
                     </a>
                   </Button>
                 </Card>
