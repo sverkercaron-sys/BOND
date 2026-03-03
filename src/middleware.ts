@@ -34,19 +34,35 @@ export async function middleware(request: NextRequest) {
   );
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
 
   // Allow public auth routes
-  if (pathname.startsWith("/login") || pathname.startsWith("/signup") || pathname === "/" || pathname.startsWith("/auth")) {
+  if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname === "/" ||
+    pathname.startsWith("/auth")
+  ) {
+    // If user is already logged in and visits login/signup, redirect to home
+    if (user && (pathname.startsWith("/login") || pathname.startsWith("/signup"))) {
+      return NextResponse.redirect(new URL("/home", request.url));
+    }
     return response;
   }
 
   // Protect app routes
-  if (pathname.startsWith("/home") || pathname.startsWith("/streak") || pathname.startsWith("/pulse") || pathname.startsWith("/history") || pathname.startsWith("/settings") || pathname.startsWith("/invite")) {
-    if (!session) {
+  if (
+    pathname.startsWith("/home") ||
+    pathname.startsWith("/streak") ||
+    pathname.startsWith("/pulse") ||
+    pathname.startsWith("/history") ||
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/invite")
+  ) {
+    if (!user) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
     return response;
@@ -54,7 +70,7 @@ export async function middleware(request: NextRequest) {
 
   // Protect admin routes
   if (pathname.startsWith("/admin")) {
-    if (!session) {
+    if (!user) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
