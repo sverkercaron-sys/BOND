@@ -27,8 +27,8 @@ export function useExercise(coupleId: string | null = null) {
         .from("daily_assignments")
         .select("exercise_id")
         .eq("couple_id", coupleId)
-        .gte("date", thirtyDaysAgoStr)
-        .lte("date", today);
+        .gte("assigned_date", thirtyDaysAgoStr)
+        .lte("assigned_date", today);
 
       const recentIds = new Set(
         recentExercises?.map((a) => a.exercise_id) || []
@@ -62,7 +62,7 @@ export function useExercise(coupleId: string | null = null) {
         .insert({
           couple_id: coupleId,
           exercise_id: randomExercise.id,
-          date: today,
+          assigned_date: today,
           user1_completed: false,
           user2_completed: false,
         })
@@ -97,7 +97,7 @@ export function useExercise(coupleId: string | null = null) {
           .from("daily_assignments")
           .select("*, exercises(*)")
           .eq("couple_id", coupleId)
-          .eq("date", today)
+          .eq("assigned_date", today)
           .single();
 
         if (assignmentError && assignmentError.code !== "PGRST116") {
@@ -137,7 +137,7 @@ export function useExercise(coupleId: string | null = null) {
         },
         (payload) => {
           if (isMounted) {
-            if (payload.new && payload.new.date === today) {
+            if (payload.new && payload.new.assigned_date === today) {
               setAssignment(payload.new);
             }
           }
