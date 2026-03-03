@@ -5,11 +5,36 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@/types";
 
+// Helper: read session from cookie manually
+function getSessionFromCookie() {
+  if (typeof document === "undefined") return null;
+  const cookies = document.cookie.split(";");
+  for (const cookie of cookies) {
+    const trimmed = cookie.trim();
+    if (trimmed.startsWith("sb-") && trimmed.includes("-auth-token=")) {
+      const value = trimmed.split("=").slice(1).join("=");
+      if (value.startsWith("base64-")) {
+        try {
+          const decoded = JSON.parse(atob(value.replace("base64-", "")));
+          if (decoded.access_token && decoded.refresh_token) {
+            return {
+              access_token: decoded.access_token,
+              refresh_token: decoded.refresh_token,
+            };
+          }
+        } catch {
+          return null;
+        }
+      }
+    }
+  }
+  return null;
+}
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
   const supabase = createClient();
 
   useEffect(() => {
@@ -17,21 +42,36 @@ export function useAuth() {
 
     const initAuth = async () => {
       try {
-        // Get current session
+        // First try getSession normally
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
-        if (session?.user && isMounted) {
+        let activeSession = session;
+
+        // If no session found, try reading cookie manually
+        if (!activeSession) {
+          const cookieSession = getSessionFromCookie();
+          if (cookieSession) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: cookieSession.access_token,
+              refresh_token: cookieSession.refresh_token,
+            });
+            if (!error && data.session) {
+              activeSession = data.session;
+            }
+          }
+        }
+
+        if (activeSession?.user && isMounted) {
           // Fetch user from users table
           const { data: userData, error } = await supabase
             .from("users")
             .select("*")
-            .eq("id", session.user.id)
+            .eq("id", activeSession.user.id)
             .single();
 
           if (error) throw error;
-
           if (isMounted) {
             setUser(userData);
           }
