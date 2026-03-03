@@ -3,13 +3,13 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Flame, Heart, BookOpen, Settings } from "lucide-react";
+import { Home, Flame, Heart, BookOpen, Settings } from "lucide-react";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/home", icon: House, label: "Home" },
+    { href: "/home", icon: Home, label: "Home" },
     { href: "/streak", icon: Flame, label: "Streak" },
     { href: "/pulse", icon: Heart, label: "Pulse" },
     { href: "/history", icon: BookOpen, label: "Historik" },
