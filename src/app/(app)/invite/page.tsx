@@ -4,12 +4,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCouple } from "@/hooks/use-couple";
 import { createClient } from "@/lib/supabase/client";
-import { getInviteUrl } from "@/lib/invite";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import Link from "next/link";
 import InviteModal from "@/components/invite-modal";
 
 interface SentInvite {
