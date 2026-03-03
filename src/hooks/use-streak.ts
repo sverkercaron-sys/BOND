@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { Milestone } from "@/types";
 
-export function useStreak(coupleId: string | null) {
+export function useStreak(coupleId: string | null = null) {
   const [streakCurrent, setStreakCurrent] = useState(0);
   const [streakBest, setStreakBest] = useState(0);
   const [totalExercises, setTotalExercises] = useState(0);
