@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bond-primary: #1B4D6E;
+  --bond-secondary: #E8B931;
+  --bond-bg: #FAFAF8;
+  --bond-card: #FFFFFF;
+  --bond-text: #1A1A1A;
+  --bond-text-light: #6B7280;
+  --bond-success: #2ECC71;
+  --bond-streak: #E74C3C;
+  --cat-appreciation: #E8B931;
+  --cat-curiosity: #4A90D9;
+  --cat-memories: #9B59B6;
+  --cat-reciprocity: #2ECC71;
+  --cat-play: #E74C3C;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto',
+    'Helvetica Neue', sans-serif;
+  background-color: var(--bond-bg);
+  color: var(--bond-text);
+  line-height: 1.6;
+}
+
+html {
+  scroll-behavior: smooth;
+}
